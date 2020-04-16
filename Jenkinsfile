@@ -25,7 +25,7 @@ pipeline {
         stage('Push image to registry') { 
             steps {
                 script {
-                    docker.withRegistry('http://172.28.128.3:30700', 'nexus-docker') {
+                    docker.withRegistry('http://172.28.128.3:30700', 'nexus-user-and-password') {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
@@ -35,20 +35,14 @@ pipeline {
         stage('Deploy to K8s cluster') { 
             steps {
                 script {
-                    withCredentials([kubeconfigFile(credentialsId: 'k8s-config', variable: 'KUBECONFIG')]) {
-                        sh '''
-                            kubectl version
+                    withCredentials([kubeconfigFile(credentialsId: 'vagrant-ssh', variable: 'SSHKEY')]) {
+                        sh '''                            
                             sed -i 's/latest/'"${BUILD_ID}"'/g' java-k8s-cicd-k82-deployment.yaml
-                            kubectl --kubeconfig=${KUBECONFIG} apply -f java-k8s-cicd-k82-deployment.yaml
+							ssh -i ${SSHKEY} vagrant@10.32.0.1 kubectl apply -f java-k8s-cicd-k82-deployment.yaml
                         '''
                     }
                     
                 }
-            }
-        }
-        stage('Remove unused docker image') { 
-            steps {
-                sh "docker image rm 172.28.128.3:30700/java-k8s-cicd:${env.BUILD_ID}"
             }
         }
     }
