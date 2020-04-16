@@ -35,7 +35,7 @@ pipeline {
         stage('Deploy to K8s cluster') { 
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'vagrant-ssh', variable: 'SSHKEY')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'vagrant-ssh', keyFileVariable: 'SSHKEY')]) {
                         sh '''                            
                             sed -i 's/latest/'"${BUILD_ID}"'/g' java-k8s-cicd-k82-deployment.yaml
 							ssh -i ${SSHKEY} vagrant@10.32.0.1 kubectl apply -f java-k8s-cicd-k82-deployment.yaml
