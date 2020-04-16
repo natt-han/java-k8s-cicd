@@ -6,8 +6,8 @@ pipeline {
     stages {
         stage('SonarQube analysis') {
             steps {
-                withSonarQubeEnv(credentialsId: 'sonarq-token', installationName: 'SonarQube') { // You can override the credential to be used
-                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar'
+                withSonarQubeEnv(credentialsId: 'sonarq-java-token', installationName: 'SonarQube') { // You can override the credential to be used
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar -Dsonar.projectKey=java-k8s-cicd -Dsonar.sources=src/main'
                 }
             }
         }
