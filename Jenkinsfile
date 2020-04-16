@@ -38,6 +38,7 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: 'vagrant-ssh', keyFileVariable: 'SSHKEY')]) {
                         sh '''                            
                             sed -i 's/latest/'"${BUILD_ID}"'/g' java-k8s-cicd-k82-deployment.yaml
+							scp -o StrictHostKeyChecking=no -i ${SSHKEY} java-k8s-cicd-k82-deployment.yaml vagrant@10.32.0.1:/home/vagrant/
 							ssh -i ${SSHKEY} vagrant@10.32.0.1 kubectl apply -f java-k8s-cicd-k82-deployment.yaml
                         '''
                     }
